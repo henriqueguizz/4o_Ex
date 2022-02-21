@@ -1,6 +1,6 @@
 rm(list = ls())
 
-#pacotes necessários
+#pacotes necessÃ¡rios
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(sf, terra, spData)
 library(dplyr)
@@ -12,14 +12,14 @@ library(geobr)
 my_rast = rast(file.path("C:\\Users\\hguzz\\4o_Ex","brasil_coverage_2020.tif"))
 
 municipio = read_municipality(year=2020)
-rio_de_janeiro = mun %>% filter(abbrev_state == "RJ") 
+rio_de_janeiro = municipio %>% filter(abbrev_state == "RJ") 
 
 #fazendo crop e mask 
 cr = crop(my_rast, vect(rio_de_janeiro))
 ms = mask(cr, vect(rio_de_janeiro))
 ex = extract(ms, vect(rio_de_janeiro))
 
-#definindo os valores de coberturas total e vegetal para cada município
+#definindo os valores de coberturas total e vegetal para cada municÃ­pio
 cobertura_total <- ex %>%
   group_by(ID) %>%
   summarise(cobertura_t = n())
@@ -29,7 +29,7 @@ cobertura_vegetal <- ex %>%
   filter(brasil_coverage_2020 %in% c(1, 3, 4, 5, 49)) %>%
   summarise(cobertura_v = n())
 
-#calculando a porcentagem de cobertura vegetal para cada município e combinando no dataframe original
+#calculando a porcentagem de cobertura vegetal para cada municÃ­pio e combinando no dataframe original
 cobertura <- cobertura_total %>%
     left_join(cobertura_vegetal, by = "ID") %>%
   mutate(pct_cobertura = cobertura_v/cobertura_t) %>%
@@ -44,10 +44,10 @@ rio_de_janeiro %>%
   ggplot() +
   geom_sf(aes(fill=pct_cobertura), alpha = 0.8, col="white") +
   scale_fill_viridis_c(name = "Porcentagem", labels = scales::comma) + 
-  labs(title = "Cobertura vegetal no Estado do Rio de Janeiro", subtitle = "Porcentagem por município", caption = "Fonte: MapBiomas, IPEA") +
+  labs(title = "Cobertura vegetal no Estado do Rio de Janeiro", subtitle = "Porcentagem por municÃ­pio", caption = "Fonte: MapBiomas, IPEA") +
   theme(plot.title = element_text(face = "bold"))
 
-#qual a média da cobertura vegetal por distrito?
+#qual a mÃ©dia da cobertura vegetal por distrito?
 output <- rio_de_janeiro %>%
   select(c("ID", "pct_cobertura"))
 output
